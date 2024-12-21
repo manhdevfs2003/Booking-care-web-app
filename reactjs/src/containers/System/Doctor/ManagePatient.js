@@ -3,27 +3,61 @@ import { connect } from "react-redux";
 import { FormattedMessage } from "react-intl";
 import "./ManagePatient.scss";
 import DatePicker from "../../../components/Input/DatePicker";
+import { getAllPatientForDoctor } from "../../../services/userService";
+import moment from "moment";
 
 class ManagePatient extends Component {
    constructor(props) {
       super(props);
       this.state = {
-         currentDate: new Date(),
+         currentDate: moment(new Date()).startOf("day").valueOf(),
+         dataPatient: [],
       };
    }
-   async componentDidMount() {}
+   async componentDidMount() {
+      let { user } = this.props;
+      let { currentDate } = this.state;
+      let formatDate = new Date(currentDate).getTime();
+      this.getDataPatient(user, formatDate);
+   }
+   getDataPatient = async (user, formatDate) => {
+      let res = await getAllPatientForDoctor({
+         doctorId: user.id,
+         date: formatDate,
+      });
+      if (res && res.errCode === 0) {
+         this.setState({
+            dataPatient: res.data,
+         });
+      }
+   };
 
    async componentDidUpdate(prevProps, preState, snapshot) {
       if (this.props.language !== prevProps.language) {
       }
    }
    handleOnchangeDatePicker = (date) => {
-      this.setState({
-         currentDate: date[0],
-      });
+      this.setState(
+         {
+            currentDate: date[0],
+         },
+         () => {
+            let { user } = this.props;
+            let { currentDate } = this.state;
+            let formatDate = new Date(currentDate).getTime();
+            this.getDataPatient(user, formatDate);
+         }
+      );
    };
-
+   handleBtnConfirm = () => {
+      console.log("confirm");
+   };
+   handleBtnRemedy = () => {
+      console.log("remedy");
+   };
    render() {
+      console.log("check21", this.state);
+      let { dataPatient } = this.state;
       return (
          <div className="manage-patient-container">
             <div className="m-p-title">Quản lý bệnh nhân khám bệnh</div>
@@ -38,41 +72,51 @@ class ManagePatient extends Component {
                </div>
                <div className="col-12 table-manage-patient">
                   <table style={{ width: "100%" }}>
-                     <tr>
-                        <th>Company</th>
-                        <th>Contact</th>
-                        <th>Country</th>
-                     </tr>
-                     <tr>
-                        <td>Alfreds Futterkiste</td>
-                        <td>Maria Anders</td>
-                        <td>Germany</td>
-                     </tr>
-                     <tr>
-                        <td>Centro comercial Moctezuma</td>
-                        <td>Francisco Chang</td>
-                        <td>Mexico</td>
-                     </tr>
-                     <tr>
-                        <td>Ernst Handel</td>
-                        <td>Roland Mendel</td>
-                        <td>Austria</td>
-                     </tr>
-                     <tr>
-                        <td>Island Trading</td>
-                        <td>Helen Bennett</td>
-                        <td>UK</td>
-                     </tr>
-                     <tr>
-                        <td>Laughing Bacchus Winecellars</td>
-                        <td>Yoshi Tannamuri</td>
-                        <td>Canada</td>
-                     </tr>
-                     <tr>
-                        <td>Magazzini Alimentari Riuniti</td>
-                        <td>Giovanni Rovelli</td>
-                        <td>Italy</td>
-                     </tr>
+                     <tbody>
+                        <tr>
+                           <th>STT</th>
+                           <th>Thời gian</th>
+                           <th>Họ và tên</th>
+                           <th>Địa chỉ</th>
+                           <th>Giới tính</th>
+                           <th>Hành động</th>
+                        </tr>
+                        {dataPatient && dataPatient.length > 0 ? (
+                           dataPatient.map((item, index) => {
+                              return (
+                                 <tr key={index}>
+                                    <td>{index + 1}</td>
+                                    <td>{item.timeTypeDataPatient.valueVi}</td>
+                                    <td>{item.patientData.firstName}</td>
+                                    <td>{item.patientData.address}</td>
+                                    <td>
+                                       {item.patientData.genderData.valueVi}
+                                    </td>
+                                    <td>
+                                       <button
+                                          className="btn btn-primary"
+                                          onClick={() =>
+                                             this.handleBtnConfirm()
+                                          }
+                                       >
+                                          Xem chi tiết
+                                       </button>
+                                       <button
+                                          className="btn btn-info"
+                                          onClick={() => this.handleBtnRemedy()}
+                                       >
+                                          Hủy lịch hẹn
+                                       </button>
+                                    </td>
+                                 </tr>
+                              );
+                           })
+                        ) : (
+                           <tr>
+                              <td colSpan="6">Không có dữ liệu</td>
+                           </tr>
+                        )}
+                     </tbody>
                   </table>{" "}
                </div>
             </div>
@@ -84,6 +128,7 @@ class ManagePatient extends Component {
 const mapStateToProps = (state) => {
    return {
       language: state.app.language,
+      user: state.user.userInfo,
    };
 };
 

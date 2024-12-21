@@ -196,7 +196,9 @@ let getDetailDoctorById = (inputId) => {
                nest: true,
             });
             if (data && data.image) {
-               data.image = new Buffer(data.image, "base64").toString("binary");
+               data.image = new Buffer.from(data.image, "base64").toString(
+                  "binary"
+               );
             }
             if (!data) data = {};
             resolve({
@@ -392,7 +394,9 @@ let getProfileDoctorById = (inputId) => {
                nest: true,
             });
             if (data && data.image) {
-               data.image = new Buffer(data.image, "base64").toString("binary");
+               data.image = new Buffer.from(data.image, "base64").toString(
+                  "binary"
+               );
             }
             if (!data) data = {};
             resolve({
@@ -421,7 +425,7 @@ let getListPatientsForDoctor = (doctorId, date) => {
                      model: db.User,
                      as: "patientData",
                      attributes: ["email", "firstName", "address", "gender"],
-                     includes: [
+                     include: [
                         {
                            model: db.Allcode,
                            as: "genderData",
@@ -429,14 +433,18 @@ let getListPatientsForDoctor = (doctorId, date) => {
                         },
                      ],
                   },
+                  {
+                     model: db.Allcode,
+                     as: "timeTypeDataPatient",
+                     attributes: ["valueEn", "valueVi"],
+                  },
                ],
                raw: false,
                nest: true,
             });
-
             resolve({
                errCode: 0,
-               data: [],
+               data: data,
             });
          }
       } catch (e) {
