@@ -50,6 +50,10 @@ let initWebRoutes = (app) => {
       "/api/get-profile-doctor-by-id",
       doctorController.getProfileDoctorById
    );
+   router.get(
+      "/api/get-list-patients-for-doctor",
+      doctorController.getListPatientsForDoctor
+   );
 
    router.post(
       "/api/patient-book-appointment",
