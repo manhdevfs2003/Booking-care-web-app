@@ -7,7 +7,7 @@ const {
 
 module.exports = {
    up: async (queryInterface, Sequelize) => {
-      await queryInterface.createTable("doctor_infor", {
+      await queryInterface.createTable("Doctor_Infor", {
          // currentNumber: DataTypes.INTEGER,
          // maxNumber: DataTypes.INTEGER,
          // date: DataTypes.DATE,
@@ -70,6 +70,6 @@ module.exports = {
       });
    },
    down: async (queryInterface, Sequelize) => {
-      await queryInterface.dropTable("doctor_infor");
+      await queryInterface.dropTable("Doctor_Infor");
    },
 };
