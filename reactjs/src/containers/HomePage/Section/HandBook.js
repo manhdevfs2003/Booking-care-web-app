@@ -1,68 +1,53 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FormattedMessage } from "react-intl";
+import "./HandBook.scss";
 import Slider from "react-slick";
+import { getAllHandbook } from "../../../services/userService";
 
-class HandBook extends Component {
+const HandBook = (props) => {
+  const [dataHandbook, setDataHandbook] = useState([]);
+  const navigate = useNavigate();
 
-    render() {
+  useEffect(() => {
+    const fetchHandbook = async () => {
+      let res = await getAllHandbook();
+      if (res && res.errCode === 0) {
+        setDataHandbook(res.data);
+      }
+    };
+    fetchHandbook();
+  }, []);
 
-        return (
-            <div className='section-share section-handbook '>
-                <div className='section-container'>
-                    <div className='section-header'>
-                        <span className='title-section'>Cẩm nang</span>
-                        <button className='btn-section'>Xem thêm</button>
-                    </div>
-                    <div className='section-body'>
-                        <Slider {...this.props.settings}>
-                            <div className='section-customize'>
-                                <div className='bg-image section-handbook' />
-                                <div>Cơ xương khớp 1</div>
-                            </div>
-                            <div className='section-customize'>
-                                <div className='bg-image section-handbook' />
-                                <div>Cơ xương khớp 2</div>
-                            </div>
-                            <div className='section-customize'>
-                                <div className='bg-image section-handbook' />
-                                <div>Cơ xương khớp 3</div>
-                            </div>
-                            <div className='section-customize'>
-                                <div className='bg-image section-handbook' />
-                                <div>Cơ xương khớp 4</div>
-                            </div>
-                            <div className='section-customize'>
-                                <div className='bg-image section-handbook' />
-                                <div>Cơ xương khớp 5</div>
-                            </div>
-                            <div className='section-customize'>
-                                <div className='bg-image section-handbook' />
-                                <div>Cơ xương khớp 6</div>
-                            </div>
+  const handleViewDetailHandbook = (handbook) => {
+    navigate(`/detail-handbook/${handbook.id}`);
+  };
 
-
-
-                        </Slider>
-                    </div>
-
+  return (
+    <div className="section-share section-handbook">
+      <div className="section-container">
+        <div className="section-header">
+          <span className="title-section">
+            <FormattedMessage id="homepage.handbook" />
+          </span>
+          <button className="btn-section" onClick={() => navigate("/handbook/seemore")}>
+            <FormattedMessage id="homepage.more-info" />
+          </button>
+        </div>
+        <div className="section-body">
+          <Slider {...props.settings}>
+            {dataHandbook.length > 0 &&
+              dataHandbook.map((item, index) => (
+                <div key={index} className="section-customize handbook-child" onClick={() => handleViewDetailHandbook(item)}>
+                  <div className="bg-image section-handbook" style={{ backgroundImage: `url(${item.image})` }} />
+                  <div className="handbook-name">{item.name}</div>
                 </div>
-            </div>
-        );
-    }
-
-}
-
-const mapStateToProps = state => {
-    return {
-        isLoggedIn: state.user.isLoggedIn,
-        lang: state.app.language,
-    };
+              ))}
+          </Slider>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(HandBook);
+export default HandBook;

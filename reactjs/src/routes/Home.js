@@ -1,29 +1,21 @@
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import { Navigate } from "react-router-dom";
+import { connect } from "react-redux";
 
 class Home extends Component {
+  render() {
+    const { isLoggedIn } = this.props;
 
-    render() {
-        const { isLoggedIn } = this.props;
-        let linkToRedirect = isLoggedIn ? '/system/user-manage' : '/home';
+    let linkToRedirect = isLoggedIn ? "/system/" : "home";
 
-        return (
-            <Redirect to={linkToRedirect} />
-        );
-    }
-
+    return <Navigate to={linkToRedirect} replace />;
+  }
 }
 
-const mapStateToProps = state => {
-    return {
-        isLoggedIn: state.user.isLoggedIn
-    };
+const mapStateToProps = (state) => {
+  return {
+    isLoggedIn: state.user.isLoggedIn,
+  };
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps)(Home);
